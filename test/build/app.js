@@ -12226,7 +12226,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 if (isVisible) {
                     this.state.progress.px = this.state.viewport.bottom - this.state.sectionOffset.top;
-                    this.state.progress.percent = Math.round(this.state.progress.px / this.state.progress.length * 100);
+                    this.state.progress.percent = (this.state.progress.px / this.state.progress.length * 100).toFixed(2);
                     this.$element.trigger('progress.scroller', this.state.progress.percent);
                 }
 
