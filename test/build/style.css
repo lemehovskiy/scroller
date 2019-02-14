@@ -224,16 +224,16 @@ section {
   max-width: 1000px;
 }
 
+.section-features .feature-item {
+  padding: 400px 0;
+}
+
 @media (min-width: 801px) {
   .section-features .feature-item {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
   }
-}
-
-.section-features .feature-item + .feature-item {
-  padding: 100px 0 0;
 }
 
 @media (max-width: 800px) {
@@ -290,6 +290,17 @@ section {
   padding: 50px;
   z-index: 1;
   position: relative;
+  background: grey;
+}
+
+.section-features .feature-item .content-col.active {
+  background: red;
+  -webkit-transition: background 1s;
+  -o-transition: background 1s;
+  transition: background 1s;
+  -webkit-transition-delay: .5s;
+  -o-transition-delay: .5s;
+  transition-delay: .5s;
 }
 
 @media (max-width: 800px) {

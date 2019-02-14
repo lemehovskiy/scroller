@@ -101,15 +101,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             var self = this;
 
             //extend by function call
-            self.settings = $.extend(true, {}, options);
-
-            self.$element = $(element);
+            this.settings = $.extend(true, {}, options);
+            this.$element = $(element);
 
             //extend by data options
-            self.data_options = self.$element.data('scroller');
-            self.settings = $.extend(true, self.settings, self.data_options);
+            this.data_options = self.$element.data('scroller');
+            this.settings = $.extend(true, self.settings, self.data_options);
 
             this.state = {
+                isVisible: false,
                 window: {
                     width: window.innerWidth,
                     height: window.innerHeight
@@ -130,24 +130,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 sectionHeight: 0
             };
 
-            self.init();
+            this.init();
         }
 
         _createClass(Scroller, [{
             key: 'init',
             value: function init() {
-
                 var self = this;
 
-                self.updateViewport();
-                self.subscribeScrollEvent();
-
-                $(window).on('resize', function () {
-                    self.updateWindowSize();
-                });
+                this.updateViewport();
+                self.onResize();
+                self.onResizeScroll();
 
                 $(window).on('scroll', function () {
-                    self.updateViewport();
+                    self.onScroll();
+                });
+
+                $(window).on('resize', function () {
+                    self.onResize();
+                });
+                $(window).on('scroll resize', function () {
+                    self.onResizeScroll();
                 });
             }
         }, {
@@ -163,41 +166,49 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.state.viewport.bottom = this.state.viewport.top + this.state.window.height;
             }
         }, {
-            key: 'subscribeScrollEvent',
-            value: function subscribeScrollEvent() {
+            key: 'onScroll',
+            value: function onScroll() {
+                this.updateViewport();
+            }
+        }, {
+            key: 'onResize',
+            value: function onResize() {
+                this.updateWindowSize();
+                this.state.sectionHeight = this.$element.outerHeight();
+                this.state.sectionOffset.top = this.$element.offset().top;
+                this.state.sectionOffset.bottom = this.state.sectionOffset.top + this.state.sectionHeight;
+                this.state.progress.length = this.state.sectionHeight + this.state.window.height;
+            }
+        }, {
+            key: 'onResizeScroll',
+            value: function onResizeScroll() {
+                var isVisible = this.state.viewport.bottom > this.state.sectionOffset.top && this.state.viewport.top < this.state.sectionOffset.bottom;
 
-                var self = this;
-
-                onResize();
-                onResizeScroll();
-
-                $(window).on('resize', function () {
-                    onResize();
-                });
-
-                $(window).on('scroll resize', function () {
-                    onResizeScroll();
-                });
-
-                function onResize() {
-                    this.state.sectionHeight = self.$element.outerHeight();
-                    this.state.sectionOffset.top = self.$element.offset().top;
-                    this.state.sectionOffset.bottom = this.state.sectionOffset.top + this.state.sectionHeight;
-                    this.state.progress.length = this.state.sectionHeight + self.wh;
+                if (isVisible) {
+                    this.state.progress.px = this.state.viewport.bottom - this.state.sectionOffset.top;
+                    this.state.progress.percent = Math.round(this.state.progress.px / this.state.progress.length * 100);
+                    this.$element.trigger('progress.scroller', this.state.progress.percent);
                 }
 
-                function onResizeScroll() {
-                    if (self.viewport_bottom > section_offset_top && self.viewport_top < section_offset_bottom) {
-
-                        self.$element.addClass('active');
-                        animation_progress_px = self.viewport_bottom - section_offset_top - animation_length / 2;
-                        animation_progress_percent = animation_progress_px / (animation_length / 2);
-
-                        console.log(animation_progress_percent);
-                    } else {
-                        self.$element.removeClass('active');
-                    }
+                if (isVisible && !this.state.isVisible) {
+                    this.onVisible();
+                } else if (!isVisible && this.state.isVisible) {
+                    this.onHidden();
                 }
+            }
+        }, {
+            key: 'onVisible',
+            value: function onVisible() {
+                this.state.isVisible = true;
+                this.$element.trigger('visible.scroller', this.state.progress.percent);
+                this.$element.addClass('active');
+            }
+        }, {
+            key: 'onHidden',
+            value: function onHidden() {
+                this.state.isVisible = false;
+                this.$element.trigger('hidden.scroller', this.state.progress.percent);
+                this.$element.removeClass('active');
             }
         }]);
 
