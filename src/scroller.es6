@@ -7,23 +7,32 @@
 
 'use strict';
 
+import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
+
 (function ($) {
     class Scroller {
         constructor(element, options) {
-
             let self = this;
 
             //extend by function call
-            this.settings = $.extend(true, {}, options);
+            this.settings = $.extend(true, {
+                triggerOffset: {
+                    top: '100vh',
+                    bottom: '-100vh'
+                }
+            }, options);
+
             this.$element = $(element);
 
             //extend by data options
             this.data_options = self.$element.data('scroller');
             this.settings = $.extend(true, self.settings, self.data_options);
 
+            this.availableUnits = ['%', 'vh', 'vw', 'px'];
+
             this.state = {
                 isVisible: false,
-                window: {
+                windowSize: {
                     width: window.innerWidth,
                     height: window.innerHeight
                 },
@@ -40,7 +49,19 @@
                     percent: 0,
                     length: 0
                 },
-                sectionHeight: 0
+                sectionHeight: 0,
+                triggerOffset: {
+                    top: {
+                        value: 0,
+                        valuePX: 0,
+                        units: 'px'
+                    },
+                    bottom: {
+                        value: 0,
+                        valuePX: 0,
+                        units: 'px'
+                    }
+                }
             };
 
             this.init();
@@ -49,9 +70,11 @@
         init() {
             let self = this;
 
-            this.updateViewport();
-            self.onResize();
-            self.onResizeScroll();
+            this.setSectionHeight(this.$element.outerHeight());
+            this.initTriggerOffset()
+            this.setViewport();
+            this.onResize();
+            this.onResizeScroll();
 
             $(window).on('scroll', function () {
                 self.onScroll();
@@ -63,28 +86,79 @@
             $(window).on('scroll resize', function () {
                 self.onResizeScroll();
             });
-
         }
 
-        updateWindowSize() {
-            this.state.window.width = window.innerWidth;
-            this.state.window.height = window.innerHeight;
-        }
+        initTriggerOffset() {
+            const triggerOffsetInputValue = this.settings.triggerOffset;
+            const {windowSize, sectionHeight,triggerOffset} = this.state;
+            const {availableUnits} = this;
 
-        updateViewport() {
+            this.setTriggerOffsetUnits({
+                top: getUnitsFromString(triggerOffsetInputValue.top, availableUnits),
+                bottom: getUnitsFromString(triggerOffsetInputValue.bottom, availableUnits)
+            });
+
+            this.setTriggerOffsetValue({
+                top: triggerOffsetInputValue.top,
+                bottom: triggerOffsetInputValue.bottom
+            });
+            this.setTriggerOffsetValuePX({
+                top: getTriggerOffsetPxValue({
+                    triggerOffsetValue: this.state.triggerOffset.top.value,
+                    windowSize: windowSize,
+                    sectionHeight: sectionHeight,
+                    units: triggerOffset.top.units
+                }),
+                bottom: getTriggerOffsetPxValue({
+                    triggerOffsetValue: this.state.triggerOffset.bottom.value,
+                    windowSize: windowSize,
+                    sectionHeight: sectionHeight,
+                    units: triggerOffset.bottom.units
+                })
+            });
+        }
+        
+        setTriggerOffsetUnits(units) {
+           this.state.triggerOffset.top.units = units.top;
+            this.state.triggerOffset.bottom.units = units.bottom;
+        }
+        setTriggerOffsetValue(value) {
+            this.state.triggerOffset.top.value = parseFloat(value.top);
+            this.state.triggerOffset.bottom.value = parseFloat(value.bottom);
+        }
+        setTriggerOffsetValuePX(value) {
+            this.state.triggerOffset.top.valuePX = value.top;
+            this.state.triggerOffset.bottom.valuePX = value.bottom;
+        }
+        setSectionHeight(value){
+            this.state.sectionHeight = value;
+        }
+        setWindowSize() {
+            this.state.windowSize.width = window.innerWidth;
+            this.state.windowSize.height = window.innerHeight;
+        }
+        setViewport() {
             this.state.viewport.top = $(window).scrollTop();
-            this.state.viewport.bottom = this.state.viewport.top + this.state.window.height;
+            this.state.viewport.bottom = this.state.viewport.top + this.state.windowSize.height;
         }
+        setOffset(){
+            const $elementOffsetTop = this.$element.offset().top;
+            this.state.sectionOffset.top = $elementOffsetTop + this.state.triggerOffset.top.valuePX;
+            this.state.sectionOffset.bottom = $elementOffsetTop + this.state.sectionHeight + this.state.triggerOffset.bottom.valuePX;
+        }
+        setProgressLength(){
+            this.state.progress.length = this.state.sectionOffset.bottom - this.state.sectionOffset.top + this.state.windowSize.height
+        }
+
         onScroll() {
-            this.updateViewport();
+            this.setViewport();
         }
 
         onResize() {
-            this.updateWindowSize();
-            this.state.sectionHeight = this.$element.outerHeight();
-            this.state.sectionOffset.top = this.$element.offset().top;
-            this.state.sectionOffset.bottom = this.state.sectionOffset.top + this.state.sectionHeight;
-            this.state.progress.length = this.state.sectionHeight + this.state.window.height;
+            this.setWindowSize();
+            this.setSectionHeight(this.$element.outerHeight());
+            this.setOffset();
+            this.setProgressLength();
         }
 
         onResizeScroll() {
@@ -95,7 +169,6 @@
                 this.state.progress.percent = (this.state.progress.px / this.state.progress.length * 100).toFixed(2);
                 this.$element.trigger('progress.scroller', this.state.progress.percent);
             }
-
             if (isVisible && !this.state.isVisible) {
                 this.onVisible();
             }

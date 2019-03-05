@@ -91,6 +91,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _helpers = __webpack_require__(1);
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function ($) {
@@ -101,16 +103,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             var self = this;
 
             //extend by function call
-            this.settings = $.extend(true, {}, options);
+            this.settings = $.extend(true, {
+                triggerOffset: {
+                    top: '100vh',
+                    bottom: '-100vh'
+                }
+            }, options);
+
             this.$element = $(element);
 
             //extend by data options
             this.data_options = self.$element.data('scroller');
             this.settings = $.extend(true, self.settings, self.data_options);
 
+            this.availableUnits = ['%', 'vh', 'vw', 'px'];
+
             this.state = {
                 isVisible: false,
-                window: {
+                windowSize: {
                     width: window.innerWidth,
                     height: window.innerHeight
                 },
@@ -127,7 +137,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     percent: 0,
                     length: 0
                 },
-                sectionHeight: 0
+                sectionHeight: 0,
+                triggerOffset: {
+                    top: {
+                        value: 0,
+                        valuePX: 0,
+                        units: 'px'
+                    },
+                    bottom: {
+                        value: 0,
+                        valuePX: 0,
+                        units: 'px'
+                    }
+                }
             };
 
             this.init();
@@ -138,9 +160,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function init() {
                 var self = this;
 
-                this.updateViewport();
-                self.onResize();
-                self.onResizeScroll();
+                this.setSectionHeight(this.$element.outerHeight());
+                this.initTriggerOffset();
+                this.setViewport();
+                this.onResize();
+                this.onResizeScroll();
 
                 $(window).on('scroll', function () {
                     self.onScroll();
@@ -154,30 +178,99 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
             }
         }, {
-            key: 'updateWindowSize',
-            value: function updateWindowSize() {
-                this.state.window.width = window.innerWidth;
-                this.state.window.height = window.innerHeight;
+            key: 'initTriggerOffset',
+            value: function initTriggerOffset() {
+                var triggerOffsetInputValue = this.settings.triggerOffset;
+                var _state = this.state,
+                    windowSize = _state.windowSize,
+                    sectionHeight = _state.sectionHeight,
+                    triggerOffset = _state.triggerOffset;
+                var availableUnits = this.availableUnits;
+
+
+                this.setTriggerOffsetUnits({
+                    top: (0, _helpers.getUnitsFromString)(triggerOffsetInputValue.top, availableUnits),
+                    bottom: (0, _helpers.getUnitsFromString)(triggerOffsetInputValue.bottom, availableUnits)
+                });
+
+                this.setTriggerOffsetValue({
+                    top: triggerOffsetInputValue.top,
+                    bottom: triggerOffsetInputValue.bottom
+                });
+                this.setTriggerOffsetValuePX({
+                    top: (0, _helpers.getTriggerOffsetPxValue)({
+                        triggerOffsetValue: this.state.triggerOffset.top.value,
+                        windowSize: windowSize,
+                        sectionHeight: sectionHeight,
+                        units: triggerOffset.top.units
+                    }),
+                    bottom: (0, _helpers.getTriggerOffsetPxValue)({
+                        triggerOffsetValue: this.state.triggerOffset.bottom.value,
+                        windowSize: windowSize,
+                        sectionHeight: sectionHeight,
+                        units: triggerOffset.bottom.units
+                    })
+                });
             }
         }, {
-            key: 'updateViewport',
-            value: function updateViewport() {
+            key: 'setTriggerOffsetUnits',
+            value: function setTriggerOffsetUnits(units) {
+                this.state.triggerOffset.top.units = units.top;
+                this.state.triggerOffset.bottom.units = units.bottom;
+            }
+        }, {
+            key: 'setTriggerOffsetValue',
+            value: function setTriggerOffsetValue(value) {
+                this.state.triggerOffset.top.value = parseFloat(value.top);
+                this.state.triggerOffset.bottom.value = parseFloat(value.bottom);
+            }
+        }, {
+            key: 'setTriggerOffsetValuePX',
+            value: function setTriggerOffsetValuePX(value) {
+                this.state.triggerOffset.top.valuePX = value.top;
+                this.state.triggerOffset.bottom.valuePX = value.bottom;
+            }
+        }, {
+            key: 'setSectionHeight',
+            value: function setSectionHeight(value) {
+                this.state.sectionHeight = value;
+            }
+        }, {
+            key: 'setWindowSize',
+            value: function setWindowSize() {
+                this.state.windowSize.width = window.innerWidth;
+                this.state.windowSize.height = window.innerHeight;
+            }
+        }, {
+            key: 'setViewport',
+            value: function setViewport() {
                 this.state.viewport.top = $(window).scrollTop();
-                this.state.viewport.bottom = this.state.viewport.top + this.state.window.height;
+                this.state.viewport.bottom = this.state.viewport.top + this.state.windowSize.height;
+            }
+        }, {
+            key: 'setOffset',
+            value: function setOffset() {
+                var $elementOffsetTop = this.$element.offset().top;
+                this.state.sectionOffset.top = $elementOffsetTop + this.state.triggerOffset.top.valuePX;
+                this.state.sectionOffset.bottom = $elementOffsetTop + this.state.sectionHeight + this.state.triggerOffset.bottom.valuePX;
+            }
+        }, {
+            key: 'setProgressLength',
+            value: function setProgressLength() {
+                this.state.progress.length = this.state.sectionOffset.bottom - this.state.sectionOffset.top + this.state.windowSize.height;
             }
         }, {
             key: 'onScroll',
             value: function onScroll() {
-                this.updateViewport();
+                this.setViewport();
             }
         }, {
             key: 'onResize',
             value: function onResize() {
-                this.updateWindowSize();
-                this.state.sectionHeight = this.$element.outerHeight();
-                this.state.sectionOffset.top = this.$element.offset().top;
-                this.state.sectionOffset.bottom = this.state.sectionOffset.top + this.state.sectionHeight;
-                this.state.progress.length = this.state.sectionHeight + this.state.window.height;
+                this.setWindowSize();
+                this.setSectionHeight(this.$element.outerHeight());
+                this.setOffset();
+                this.setProgressLength();
             }
         }, {
             key: 'onResizeScroll',
@@ -189,7 +282,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.state.progress.percent = (this.state.progress.px / this.state.progress.length * 100).toFixed(2);
                     this.$element.trigger('progress.scroller', this.state.progress.percent);
                 }
-
                 if (isVisible && !this.state.isVisible) {
                     this.onVisible();
                 } else if (!isVisible && this.state.isVisible) {
@@ -229,6 +321,34 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return $this;
     };
 })(jQuery);
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var getUnitsFromString = exports.getUnitsFromString = function getUnitsFromString(str, units) {
+    for (var i = 0; i < units.length; i++) {
+        var unit = units[i];
+        var reg = new RegExp("\\d+" + unit);
+
+        if (str.match(reg) !== null) return unit;
+    }
+};
+
+var getTriggerOffsetPxValue = exports.getTriggerOffsetPxValue = function getTriggerOffsetPxValue(_ref) {
+    var triggerOffsetValue = _ref.triggerOffsetValue,
+        windowSize = _ref.windowSize,
+        sectionHeight = _ref.sectionHeight,
+        units = _ref.units;
+
+    if (units === 'px') return triggerOffsetValue;else if (units === '%') return sectionHeight / 100 * triggerOffsetValue;else if (units === 'vh') return windowSize.height / 100 * triggerOffsetValue;else if (units === 'vw') return windowSize.width / 100 * triggerOffsetValue;
+};
 
 /***/ })
 /******/ ]);
