@@ -17,8 +17,8 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
             //extend by function call
             this.settings = $.extend(true, {
                 triggerOffset: {
-                    top: '100vh',
-                    bottom: '-100vh'
+                    top: 0,
+                    bottom: 0
                 }
             }, options);
 
@@ -75,6 +75,7 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
             this.setViewport();
             this.onResize();
             this.onResizeScroll();
+            this.onInit();
 
             $(window).on('scroll', function () {
                 self.onScroll();
@@ -88,14 +89,23 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
             });
         }
 
+        onInit(){
+            let progress = this.getProgress();
+
+            if (progress > 100) progress = 100;
+            if (progress < 100) progress = 0;
+
+            this.$element.trigger('init.scroller', progress);
+        }
+
         initTriggerOffset() {
             const triggerOffsetInputValue = this.settings.triggerOffset;
             const {windowSize, sectionHeight,triggerOffset} = this.state;
             const {availableUnits} = this;
 
             this.setTriggerOffsetUnits({
-                top: getUnitsFromString(triggerOffsetInputValue.top, availableUnits),
-                bottom: getUnitsFromString(triggerOffsetInputValue.bottom, availableUnits)
+                top: typeof triggerOffsetInputValue.top === 'string' ? getUnitsFromString(triggerOffsetInputValue.top, availableUnits) : 'px',
+                bottom: typeof triggerOffsetInputValue.bottom === 'string' ? getUnitsFromString(triggerOffsetInputValue.bottom, availableUnits) : 'px'
             });
 
             this.setTriggerOffsetValue({
@@ -161,12 +171,23 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
             this.setProgressLength();
         }
 
+        isVisible(){
+            return this.state.viewport.bottom > this.state.sectionOffset.top && this.state.viewport.top < this.state.sectionOffset.bottom;
+        }
+
+        setProgress(progress){
+            this.state.progress.percent = progress;
+        }
+
+        getProgress(){
+            return ((this.state.viewport.bottom - this.state.sectionOffset.top) / this.state.progress.length * 100).toFixed(2);
+        }
+
         onResizeScroll() {
-            const isVisible = this.state.viewport.bottom > this.state.sectionOffset.top && this.state.viewport.top < this.state.sectionOffset.bottom;
+            const isVisible = this.isVisible();
 
             if (isVisible) {
-                this.state.progress.px = this.state.viewport.bottom - this.state.sectionOffset.top;
-                this.state.progress.percent = (this.state.progress.px / this.state.progress.length * 100).toFixed(2);
+                this.setProgress(this.getProgress());
                 this.$element.trigger('progress.scroller', this.state.progress.percent);
             }
             if (isVisible && !this.state.isVisible) {
@@ -180,13 +201,11 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
         onVisible() {
             this.state.isVisible = true;
             this.$element.trigger('visible.scroller', this.state.progress.percent);
-            this.$element.addClass('active');
         }
 
         onHidden() {
             this.state.isVisible = false;
             this.$element.trigger('hidden.scroller', this.state.progress.percent);
-            this.$element.removeClass('active');
         }
     }
 

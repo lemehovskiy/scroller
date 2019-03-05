@@ -105,8 +105,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             //extend by function call
             this.settings = $.extend(true, {
                 triggerOffset: {
-                    top: '100vh',
-                    bottom: '-100vh'
+                    top: 0,
+                    bottom: 0
                 }
             }, options);
 
@@ -165,6 +165,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.setViewport();
                 this.onResize();
                 this.onResizeScroll();
+                this.onInit();
 
                 $(window).on('scroll', function () {
                     self.onScroll();
@@ -178,6 +179,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
             }
         }, {
+            key: 'onInit',
+            value: function onInit() {
+                var progress = this.getProgress();
+
+                if (progress > 100) progress = 100;
+                if (progress < 100) progress = 0;
+
+                this.$element.trigger('init.scroller', progress);
+            }
+        }, {
             key: 'initTriggerOffset',
             value: function initTriggerOffset() {
                 var triggerOffsetInputValue = this.settings.triggerOffset;
@@ -189,8 +200,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 
                 this.setTriggerOffsetUnits({
-                    top: (0, _helpers.getUnitsFromString)(triggerOffsetInputValue.top, availableUnits),
-                    bottom: (0, _helpers.getUnitsFromString)(triggerOffsetInputValue.bottom, availableUnits)
+                    top: typeof triggerOffsetInputValue.top === 'string' ? (0, _helpers.getUnitsFromString)(triggerOffsetInputValue.top, availableUnits) : 'px',
+                    bottom: typeof triggerOffsetInputValue.bottom === 'string' ? (0, _helpers.getUnitsFromString)(triggerOffsetInputValue.bottom, availableUnits) : 'px'
                 });
 
                 this.setTriggerOffsetValue({
@@ -273,13 +284,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.setProgressLength();
             }
         }, {
+            key: 'isVisible',
+            value: function isVisible() {
+                return this.state.viewport.bottom > this.state.sectionOffset.top && this.state.viewport.top < this.state.sectionOffset.bottom;
+            }
+        }, {
+            key: 'setProgress',
+            value: function setProgress(progress) {
+                this.state.progress.percent = progress;
+            }
+        }, {
+            key: 'getProgress',
+            value: function getProgress() {
+                return ((this.state.viewport.bottom - this.state.sectionOffset.top) / this.state.progress.length * 100).toFixed(2);
+            }
+        }, {
             key: 'onResizeScroll',
             value: function onResizeScroll() {
-                var isVisible = this.state.viewport.bottom > this.state.sectionOffset.top && this.state.viewport.top < this.state.sectionOffset.bottom;
+                var isVisible = this.isVisible();
 
                 if (isVisible) {
-                    this.state.progress.px = this.state.viewport.bottom - this.state.sectionOffset.top;
-                    this.state.progress.percent = (this.state.progress.px / this.state.progress.length * 100).toFixed(2);
+                    this.setProgress(this.getProgress());
                     this.$element.trigger('progress.scroller', this.state.progress.percent);
                 }
                 if (isVisible && !this.state.isVisible) {
@@ -293,14 +318,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function onVisible() {
                 this.state.isVisible = true;
                 this.$element.trigger('visible.scroller', this.state.progress.percent);
-                this.$element.addClass('active');
             }
         }, {
             key: 'onHidden',
             value: function onHidden() {
                 this.state.isVisible = false;
                 this.$element.trigger('hidden.scroller', this.state.progress.percent);
-                this.$element.removeClass('active');
             }
         }]);
 
