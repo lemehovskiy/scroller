@@ -24,7 +24,7 @@ $(document).ready(function () {
             ww = $(window).outerWidth(),
             $sliderProgress = 0;
 
-        $sliderSection.on('progress.scroller init.scroller', function (item, progress) {
+        $sliderSection.on('progress.scroller refresh.scroller init.scroller', function (item, progress) {
             $sliderProgress = progress;
             handleProgressChange(progress);
         })

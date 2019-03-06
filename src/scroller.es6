@@ -69,9 +69,8 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
 
         init() {
             let self = this;
-
             this.setSectionHeight(this.$element.outerHeight());
-            this.initTriggerOffset()
+            this.setTriggerOffset()
             this.setViewport();
             this.onResize();
             this.onResizeScroll();
@@ -82,6 +81,7 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
             });
 
             $(window).on('resize', function () {
+                self.setTriggerOffset();
                 self.onResize();
             });
             $(window).on('scroll resize', function () {
@@ -91,14 +91,12 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
 
         onInit(){
             let progress = this.getProgress();
-
             if (progress > 100) progress = 100;
             if (progress < 100) progress = 0;
-
             this.$element.trigger('init.scroller', progress);
         }
 
-        initTriggerOffset() {
+        setTriggerOffset() {
             const triggerOffsetInputValue = this.settings.triggerOffset;
             const {windowSize, sectionHeight,triggerOffset} = this.state;
             const {availableUnits} = this;
@@ -127,7 +125,7 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
                 })
             });
         }
-        
+
         setTriggerOffsetUnits(units) {
            this.state.triggerOffset.top.units = units.top;
             this.state.triggerOffset.bottom.units = units.bottom;
@@ -206,6 +204,12 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
         onHidden() {
             this.state.isVisible = false;
             this.$element.trigger('hidden.scroller', this.state.progress.percent);
+        }
+
+        refresh(){
+            this.onResize();
+            this.setProgress(this.getProgress());
+            this.$element.trigger('refresh.scroller', this.state.progress.percent);
         }
     }
 

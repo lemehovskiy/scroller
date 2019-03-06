@@ -7092,7 +7092,7 @@ $(document).ready(function () {
             ww = $(window).outerWidth(),
             $sliderProgress = 0;
 
-        $sliderSection.on('progress.scroller init.scroller', function (item, progress) {
+        $sliderSection.on('progress.scroller refresh.scroller init.scroller', function (item, progress) {
             $sliderProgress = progress;
             handleProgressChange(progress);
         });
@@ -12261,9 +12261,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: 'init',
             value: function init() {
                 var self = this;
-
                 this.setSectionHeight(this.$element.outerHeight());
-                this.initTriggerOffset();
+                this.setTriggerOffset();
                 this.setViewport();
                 this.onResize();
                 this.onResizeScroll();
@@ -12274,6 +12273,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
 
                 $(window).on('resize', function () {
+                    self.setTriggerOffset();
                     self.onResize();
                 });
                 $(window).on('scroll resize', function () {
@@ -12284,15 +12284,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: 'onInit',
             value: function onInit() {
                 var progress = this.getProgress();
-
                 if (progress > 100) progress = 100;
                 if (progress < 100) progress = 0;
-
                 this.$element.trigger('init.scroller', progress);
             }
         }, {
-            key: 'initTriggerOffset',
-            value: function initTriggerOffset() {
+            key: 'setTriggerOffset',
+            value: function setTriggerOffset() {
                 var triggerOffsetInputValue = this.settings.triggerOffset;
                 var _state = this.state,
                     windowSize = _state.windowSize,
@@ -12426,6 +12424,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function onHidden() {
                 this.state.isVisible = false;
                 this.$element.trigger('hidden.scroller', this.state.progress.percent);
+            }
+        }, {
+            key: 'refresh',
+            value: function refresh() {
+                this.onResize();
+                this.setProgress(this.getProgress());
+                this.$element.trigger('refresh.scroller', this.state.progress.percent);
             }
         }]);
 
