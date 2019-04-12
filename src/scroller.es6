@@ -19,7 +19,8 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
                 triggerOffset: {
                     top: 0,
                     bottom: 0
-                }
+                },
+                $elementTo: false
             }, options);
 
             this.$element = $(element);
@@ -69,7 +70,8 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
 
         init() {
             let self = this;
-            this.setSectionHeight(this.$element.outerHeight());
+
+            this.setSectionHeight(this.getSectionHeight());
             this.setTriggerOffset()
             this.setViewport();
             this.onResize();
@@ -87,6 +89,19 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
             $(window).on('scroll resize', function () {
                 self.onResizeScroll();
             });
+        }
+
+        getSectionHeight(){
+            let sectionHeight = 0;
+
+            if (this.settings.$elementTo) {
+                sectionHeight = this.settings.$elementTo.offset().top + this.settings.$elementTo.outerHeight() - this.$element.offset().top;
+            }
+            else {
+                sectionHeight = this.$element.outerHeight();
+            }
+
+            return sectionHeight;
         }
 
         onInit(){
@@ -151,8 +166,12 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
         }
         setOffset(){
             const $elementOffsetTop = this.$element.offset().top;
-            this.state.sectionOffset.top = $elementOffsetTop + this.state.triggerOffset.top.valuePX;
-            this.state.sectionOffset.bottom = $elementOffsetTop + this.state.sectionHeight + this.state.triggerOffset.bottom.valuePX;
+            const offsetTop = $elementOffsetTop + this.state.triggerOffset.top.valuePX;
+            const offsetBottom = $elementOffsetTop + this.getSectionHeight() + this.state.triggerOffset.bottom.valuePX;
+            console.log(offsetTop);
+            console.log(offsetBottom);
+            this.state.sectionOffset.top = offsetTop;
+            this.state.sectionOffset.bottom = offsetBottom;
         }
         setProgressLength(){
             this.state.progress.length = this.state.sectionOffset.bottom - this.state.sectionOffset.top + this.state.windowSize.height

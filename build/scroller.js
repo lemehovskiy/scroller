@@ -107,7 +107,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 triggerOffset: {
                     top: 0,
                     bottom: 0
-                }
+                },
+                $elementTo: false
             }, options);
 
             this.$element = $(element);
@@ -159,7 +160,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: 'init',
             value: function init() {
                 var self = this;
-                this.setSectionHeight(this.$element.outerHeight());
+
+                this.setSectionHeight(this.getSectionHeight());
                 this.setTriggerOffset();
                 this.setViewport();
                 this.onResize();
@@ -177,6 +179,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 $(window).on('scroll resize', function () {
                     self.onResizeScroll();
                 });
+            }
+        }, {
+            key: 'getSectionHeight',
+            value: function getSectionHeight() {
+                var sectionHeight = 0;
+
+                if (this.settings.$elementTo) {
+                    sectionHeight = this.settings.$elementTo.offset().top + this.settings.$elementTo.outerHeight() - this.$element.offset().top;
+                } else {
+                    sectionHeight = this.$element.outerHeight();
+                }
+
+                return sectionHeight;
             }
         }, {
             key: 'onInit',
@@ -260,8 +275,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: 'setOffset',
             value: function setOffset() {
                 var $elementOffsetTop = this.$element.offset().top;
-                this.state.sectionOffset.top = $elementOffsetTop + this.state.triggerOffset.top.valuePX;
-                this.state.sectionOffset.bottom = $elementOffsetTop + this.state.sectionHeight + this.state.triggerOffset.bottom.valuePX;
+                var offsetTop = $elementOffsetTop + this.state.triggerOffset.top.valuePX;
+                var offsetBottom = $elementOffsetTop + this.getSectionHeight() + this.state.triggerOffset.bottom.valuePX;
+                console.log(offsetTop);
+                console.log(offsetBottom);
+                this.state.sectionOffset.top = offsetTop;
+                this.state.sectionOffset.bottom = offsetBottom;
             }
         }, {
             key: 'setProgressLength',

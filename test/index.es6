@@ -75,8 +75,28 @@ $(document).ready(function () {
         }
     }
 
-    initSlider();
-    initProgressDemo();
+    function initElementToDemo(){
 
+        $('.pack1').on('visible.scroller progress.scroller', function (item, progress) {
+            console.log(progress);
+        })
+
+        $('.pack1').scroller({
+            triggerOffset: {
+                top: '50vh',
+                bottom: '-100vh'
+            },
+            $elementTo: $('.pack4')
+        });
+
+    }
+
+    // initSlider();
+    // initProgressDemo();
+
+
+
+
+    initElementToDemo();
 });
 
