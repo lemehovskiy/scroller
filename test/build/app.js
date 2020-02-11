@@ -7156,9 +7156,8 @@ $(document).ready(function () {
         });
     }
 
-    // initSlider();
-    // initProgressDemo();
-
+    initSlider();
+    initProgressDemo();
 
     initElementToDemo();
 });
