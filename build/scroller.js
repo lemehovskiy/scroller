@@ -197,8 +197,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: 'onInit',
             value: function onInit() {
                 var progress = this.getProgress();
-                if (progress > 100) progress = 100;
-                if (progress < 100) progress = 0;
+                if (progress > 1) progress = 1;
+                if (progress < 1) progress = 0;
                 this.$element.trigger('init.scroller', progress);
             }
         }, {
@@ -277,8 +277,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var $elementOffsetTop = this.$element.offset().top;
                 var offsetTop = $elementOffsetTop + this.state.triggerOffset.top.valuePX;
                 var offsetBottom = $elementOffsetTop + this.getSectionHeight() + this.state.triggerOffset.bottom.valuePX;
-                console.log(offsetTop);
-                console.log(offsetBottom);
                 this.state.sectionOffset.top = offsetTop;
                 this.state.sectionOffset.bottom = offsetBottom;
             }
@@ -313,7 +311,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'getProgress',
             value: function getProgress() {
-                return ((this.state.viewport.bottom - this.state.sectionOffset.top) / this.state.progress.length * 100).toFixed(2);
+                return (this.state.viewport.bottom - this.state.sectionOffset.top) / this.state.progress.length;
             }
         }, {
             key: 'onResizeScroll',

@@ -106,8 +106,8 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
 
         onInit(){
             let progress = this.getProgress();
-            if (progress > 100) progress = 100;
-            if (progress < 100) progress = 0;
+            if (progress > 1) progress = 1;
+            if (progress < 1) progress = 0;
             this.$element.trigger('init.scroller', progress);
         }
 
@@ -168,8 +168,6 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
             const $elementOffsetTop = this.$element.offset().top;
             const offsetTop = $elementOffsetTop + this.state.triggerOffset.top.valuePX;
             const offsetBottom = $elementOffsetTop + this.getSectionHeight() + this.state.triggerOffset.bottom.valuePX;
-            console.log(offsetTop);
-            console.log(offsetBottom);
             this.state.sectionOffset.top = offsetTop;
             this.state.sectionOffset.bottom = offsetBottom;
         }
@@ -197,7 +195,7 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
         }
 
         getProgress(){
-            return ((this.state.viewport.bottom - this.state.sectionOffset.top) / this.state.progress.length * 100).toFixed(2);
+            return ((this.state.viewport.bottom - this.state.sectionOffset.top) / this.state.progress.length);
         }
 
         onResizeScroll() {

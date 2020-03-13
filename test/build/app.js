@@ -7071,95 +7071,170 @@ __webpack_require__(67);
 __webpack_require__(68);
 __webpack_require__(108);
 
+var initHorizontalScroll = function initHorizontalScroll() {
+  var $root = $('.horizontal-scroll');
+  var $itemsWrapper = $('.horizontal-scroll__items-wrapper');
+  var $items = $itemsWrapper.find('.horizontal-scroll__item');
+
+  var state = {
+    itemsWrapperWidth: 0,
+    ww: 0
+  };
+
+  var init = function init() {
+    var totalWidth = getTotalWidth();
+    onResize();
+
+    console.log('init');
+
+    $root.on('progress.scroller refresh.scroller init.scroller', function (item, progress) {
+      handleProgressChange(progress);
+    });
+
+    $root.on('hidden.scroller', function (item, progress) {
+      if (progress < 0.5) {
+        handleProgressChange(0);
+      } else {
+        handleProgressChange(1);
+      }
+    });
+
+    console.log('initScroller');
+
+    setItemsWrapperWidth(totalWidth);
+    setScrollHeight(totalWidth);
+
+    $root.scroller({
+      triggerOffset: {
+        top: '100vh',
+        bottom: '-100vh'
+      }
+    });
+  };
+
+  var onResize = function onResize() {
+    return [state.ww = $(window).outerWidth()];
+  };
+
+  var handleProgressChange = function handleProgressChange(progress) {
+    TweenMax.to($itemsWrapper, .5, { x: -(state.itemsWrapperWidth - state.ww) * progress });
+  };
+
+  var setScrollHeight = function setScrollHeight(height) {
+    $root.height(height);
+  };
+
+  var setItemsWrapperWidth = function setItemsWrapperWidth(width) {
+    state.itemsWrapperWidth = width;
+    $itemsWrapper.width(width);
+  };
+
+  var getTotalWidth = function getTotalWidth() {
+    var width = 0;
+
+    $items.each(function () {
+      width += $(this).outerWidth();
+    });
+
+    console.log(width);
+    return width;
+  };
+
+  init();
+};
+
+$(window).on('load', function () {
+  initHorizontalScroll();
+});
+
 $(document).ready(function () {
 
-    function initProgressDemo() {
-        $('.content-col').each(function () {
-            var $progressElement = $(this).find('.progress');
+  function initProgressDemo() {
+    $('.content-col').each(function () {
+      var $progressElement = $(this).find('.progress');
 
-            $(this).on('visible.scroller progress.scroller', function (item, progress) {
-                $progressElement.text(progress);
-            });
-        });
+      $(this).on('visible.scroller progress.scroller', function (item, progress) {
+        $progressElement.text(progress);
+      });
+    });
 
-        $('.content-col').scroller();
+    $('.content-col').scroller();
+  }
+
+  function initSlider() {
+    var $sliderSection = $('.slider-section'),
+        $slider = $('.slider-section .slider'),
+        sliderWidth = $slider.outerWidth(),
+        ww = $(window).outerWidth(),
+        $sliderProgress = 0;
+
+    $sliderSection.on('progress.scroller refresh.scroller init.scroller', function (item, progress) {
+      $sliderProgress = progress;
+      handleProgressChange(progress);
+    });
+
+    $sliderSection.on('visible.scroller', function (item, progress) {
+      $slider.addClass('fixed');
+    });
+
+    $sliderSection.on('hidden.scroller', function (item, progress) {
+      $slider.removeClass('fixed');
+      if (progress < 0.5) {
+        handleProgressChange(0);
+      } else {
+        handleProgressChange(1);
+      }
+    });
+
+    $sliderSection.scroller({
+      triggerOffset: {
+        top: '100vh',
+        bottom: '-100vh'
+      }
+    });
+
+    $(window).on('resize', onResize);
+
+    function onResize() {
+      ww = $(window).outerWidth();
+      handleProgressChange($sliderProgress);
     }
 
-    function initSlider() {
-        var $sliderSection = $('.slider-section'),
-            $slider = $('.slider-section .slider'),
-            sliderWidth = $slider.outerWidth(),
-            ww = $(window).outerWidth(),
-            $sliderProgress = 0;
-
-        $sliderSection.on('progress.scroller refresh.scroller init.scroller', function (item, progress) {
-            $sliderProgress = progress;
-            handleProgressChange(progress);
-        });
-
-        $sliderSection.on('visible.scroller', function (item, progress) {
-            $slider.addClass('fixed');
-        });
-
-        $sliderSection.on('hidden.scroller', function (item, progress) {
-            $slider.removeClass('fixed');
-            if (progress < 50) {
-                handleProgressChange(0);
-            } else {
-                handleProgressChange(100);
-            }
-        });
-
-        $sliderSection.scroller({
-            triggerOffset: {
-                top: '100vh',
-                bottom: '-100vh'
-            }
-        });
-
-        $(window).on('resize', onResize);
-
-        function onResize() {
-            ww = $(window).outerWidth();
-            handleProgressChange($sliderProgress);
-        }
-
-        function handleProgressChange(progress) {
-            var roundedProgress = Math.round(progress);
-            handlePositionByProgress(roundedProgress);
-            TweenMax.to($slider, .5, { x: -(sliderWidth - ww) / 100 * roundedProgress });
-        }
-
-        function handlePositionByProgress(progress) {
-            if (progress > 50) {
-                $slider.addClass('on-bottom');
-                $slider.removeClass('on-top');
-            } else {
-                $slider.addClass('on-top');
-                $slider.removeClass('on-bottom');
-            }
-        }
+    function handleProgressChange(progress) {
+      var roundedProgress = Math.round(progress);
+      handlePositionByProgress(roundedProgress);
+      TweenMax.to($slider, .5, { x: -(sliderWidth - ww) * progress });
     }
 
-    function initElementToDemo() {
-
-        $('.pack1').on('visible.scroller progress.scroller', function (item, progress) {
-            console.log(progress);
-        });
-
-        $('.pack1').scroller({
-            triggerOffset: {
-                top: '50vh',
-                bottom: '-100vh'
-            },
-            $elementTo: $('.pack4')
-        });
+    function handlePositionByProgress(progress) {
+      if (progress > 0.5) {
+        $slider.addClass('on-bottom');
+        $slider.removeClass('on-top');
+      } else {
+        $slider.addClass('on-top');
+        $slider.removeClass('on-bottom');
+      }
     }
+  }
 
-    initSlider();
-    initProgressDemo();
+  function initElementToDemo() {
 
-    initElementToDemo();
+    $('.pack1').on('visible.scroller progress.scroller', function (item, progress) {
+      console.log(progress);
+    });
+
+    $('.pack1').scroller({
+      triggerOffset: {
+        top: '50vh',
+        bottom: '-100vh'
+      },
+      $elementTo: $('.pack4')
+    });
+  }
+
+  initSlider();
+  initProgressDemo();
+  initElementToDemo();
 });
 
 /***/ }),
@@ -12316,8 +12391,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: 'onInit',
             value: function onInit() {
                 var progress = this.getProgress();
-                if (progress > 100) progress = 100;
-                if (progress < 100) progress = 0;
+                if (progress > 1) progress = 1;
+                if (progress < 1) progress = 0;
                 this.$element.trigger('init.scroller', progress);
             }
         }, {
@@ -12396,8 +12471,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var $elementOffsetTop = this.$element.offset().top;
                 var offsetTop = $elementOffsetTop + this.state.triggerOffset.top.valuePX;
                 var offsetBottom = $elementOffsetTop + this.getSectionHeight() + this.state.triggerOffset.bottom.valuePX;
-                console.log(offsetTop);
-                console.log(offsetBottom);
                 this.state.sectionOffset.top = offsetTop;
                 this.state.sectionOffset.bottom = offsetBottom;
             }
@@ -12432,7 +12505,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'getProgress',
             value: function getProgress() {
-                return ((this.state.viewport.bottom - this.state.sectionOffset.top) / this.state.progress.length * 100).toFixed(2);
+                return (this.state.viewport.bottom - this.state.sectionOffset.top) / this.state.progress.length;
             }
         }, {
             key: 'onResizeScroll',

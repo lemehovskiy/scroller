@@ -1,0 +1,36 @@
+.horizontal-scroll {
+  //overflow: hidden;
+}
+
+.horizontal-scroll_inner {
+  overflow: hidden;
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.horizontal-scroll__items-wrapper {
+  display: flex;
+  height: 100vh;
+  //position: fixed;
+  //left: 0;
+  //top: 0;
+  //width: 100%;
+  //height: 100%;
+
+  $colors: red, orange, yellow, green, blue, purple, red, orange, yellow, green, blue, purple;
+  $repeat: 12;
+  $colorCounter: 1;
+
+  @for $i from 1 through $repeat {
+    > .horizontal-scroll__item:nth-child(#{length($repeat)}n+#{$i}) {
+      background: lighten(nth($colors, $i), 20%);
+    }
+  }
+}
+
+.horizontal-scroll__item {
+  min-width: 100vw;
+}
