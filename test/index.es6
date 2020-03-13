@@ -49,7 +49,7 @@ const initHorizontalScroll = () => {
   ]
 
   const handleProgressChange = (progress) => {
-    TweenMax.to($itemsWrapper, .5, { x: -(state.itemsWrapperWidth - state.ww) * progress })
+    TweenMax.to($itemsWrapper, 1, { x: -(state.itemsWrapperWidth - state.ww) * progress })
   }
 
   const setScrollHeight = (height) => {

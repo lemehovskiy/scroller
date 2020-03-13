@@ -7117,7 +7117,7 @@ var initHorizontalScroll = function initHorizontalScroll() {
   };
 
   var handleProgressChange = function handleProgressChange(progress) {
-    TweenMax.to($itemsWrapper, .5, { x: -(state.itemsWrapperWidth - state.ww) * progress });
+    TweenMax.to($itemsWrapper, 1, { x: -(state.itemsWrapperWidth - state.ww) * progress });
   };
 
   var setScrollHeight = function setScrollHeight(height) {
