@@ -9,10 +9,10 @@ body {
 
 .horizontal-scroll__wrapper {
   height: 100vh;
-  overflow: auto;
-  &::-webkit-scrollbar {
+  overflow: hidden;
+  //&::-webkit-scrollbar {
     //display: none;
-  }
+  //}
 }
 
 .horizontal-scroll_inner {
