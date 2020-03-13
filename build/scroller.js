@@ -267,7 +267,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'setWindowSize',
             value: function setWindowSize() {
-                console.log('setWindowSize');
                 this.state.windowSize.width = this.settings.scrollElement.outerWidth();
                 this.state.windowSize.height = this.settings.scrollElement.outerHeight();
             }
@@ -299,7 +298,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'onResize',
             value: function onResize() {
-                console.log('onResize');
                 this.setWindowSize();
                 this.setSectionHeight(this.$element.outerHeight());
                 this.setOffset();
@@ -313,7 +311,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'setProgress',
             value: function setProgress(progress) {
-                console.log(progress);
                 this.state.progress.percent = progress;
             }
         }, {
@@ -345,7 +342,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'onHidden',
             value: function onHidden() {
-                console.log('onHidden');
                 this.state.isVisible = false;
                 this.$element.trigger('hidden.scroller', this.state.progress.percent);
             }

@@ -162,7 +162,6 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
             this.state.sectionHeight = value;
         }
         setWindowSize() {
-            console.log('setWindowSize');
             this.state.windowSize.width = this.settings.scrollElement.outerWidth();
             this.state.windowSize.height = this.settings.scrollElement.outerHeight();
         }
@@ -186,7 +185,6 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
         }
 
         onResize() {
-            console.log('onResize');
             this.setWindowSize();
             this.setSectionHeight(this.$element.outerHeight());
             this.setOffset();
@@ -198,7 +196,6 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
         }
 
         setProgress(progress){
-            console.log(progress);
             this.state.progress.percent = progress;
         }
 
@@ -227,7 +224,6 @@ import {getUnitsFromString, getTriggerOffsetPxValue} from './helpers.es6';
         }
 
         onHidden() {
-            console.log('onHidden');
             this.state.isVisible = false;
             this.$element.trigger('hidden.scroller', this.state.progress.percent);
         }

@@ -1,6 +1,14 @@
 require("./sass/style.scss");
 require("jquery");
+require("./jquery.mousewheel.js")
 require('../build/scroller.js');
+
+
+$(window).on('load', function () {
+  $('body').mousewheel(function (event, delta) {
+    $('.horizontal-scroll__wrapper')[0].scrollTop -= (delta)
+  });
+});
 
 
 const initHorizontalScroll = () => {
@@ -8,6 +16,8 @@ const initHorizontalScroll = () => {
   const $scrollWrapper = $('.horizontal-scroll__wrapper');
   const $itemsWrapper = $('.horizontal-scroll__items-wrapper');
   const $items = $itemsWrapper.find('.horizontal-scroll__item');
+
+  $('.horizontal-scroll__wrapper').scrollTop(1000);
 
   let resizeTimeout = null;
 
@@ -43,7 +53,7 @@ const initHorizontalScroll = () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
         onResize();
-      }, 200)
+      }, 400)
     })
   }
 

@@ -551,10 +551,6 @@ body {
   overflow: auto;
 }
 
-.horizontal-scroll__wrapper::-webkit-scrollbar {
-  display: none;
-}
-
 .horizontal-scroll_inner {
   overflow: hidden;
   position: fixed;
