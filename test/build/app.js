@@ -7085,28 +7085,41 @@ $(window).on('load', function () {
   //   $(document).trigger('mousewheel');
   // });
 
-  var delta;
+  subscribeTouch();
+});
+
+var subscribeTouch = function subscribeTouch() {
+  var deltaX;
+  var deltaY;
   var lastY;
+  var lastX;
+
+  var speed = -5;
 
   // reset touch position on touchstart
   $('.horizontal-scroll__wrapper').bind('touchstart', function (e) {
     var currentY = e.originalEvent.touches[0].clientY;
+    var currentX = e.originalEvent.touches[0].clientX;
     lastY = currentY;
+    lastX = currentX;
     e.preventDefault();
   });
 
   // get movement and scroll the same way
   $('.horizontal-scroll__wrapper').bind('touchmove', function (e) {
     var currentY = e.originalEvent.touches[0].clientY;
-    delta = (currentY - lastY) * -10;
+    var currentX = e.originalEvent.touches[0].clientX;
+    deltaY = currentY - lastY;
+    deltaX = currentX - lastX;
 
-    this.scrollTop += delta;
+    this.scrollTop += deltaY * speed;
+    this.scrollTop += deltaX * speed;
     lastY = currentY;
+    lastX = currentX;
 
-    console.log(delta);
     e.preventDefault();
   });
-});
+};
 
 var initHorizontalScroll = function initHorizontalScroll() {
   var $root = $('.horizontal-scroll');
