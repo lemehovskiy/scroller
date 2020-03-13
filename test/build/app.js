@@ -7073,8 +7073,38 @@ __webpack_require__(113);
 __webpack_require__(108);
 
 $(window).on('load', function () {
+
   $('body').mousewheel(function (event, delta) {
     $('.horizontal-scroll__wrapper')[0].scrollTop -= delta;
+  });
+
+  // $(document).on('touchmove', function(e) { //touchmove works for iOS, I don't know if Android supports it
+  //
+  //   console.log(e.originalEvent.touches[0].clientY);
+  //   console.log('touchmove');
+  //   $(document).trigger('mousewheel');
+  // });
+
+  var delta;
+  var lastY;
+
+  // reset touch position on touchstart
+  $('.horizontal-scroll__wrapper').bind('touchstart', function (e) {
+    var currentY = e.originalEvent.touches[0].clientY;
+    lastY = currentY;
+    e.preventDefault();
+  });
+
+  // get movement and scroll the same way
+  $('.horizontal-scroll__wrapper').bind('touchmove', function (e) {
+    var currentY = e.originalEvent.touches[0].clientY;
+    delta = (currentY - lastY) * -10;
+
+    this.scrollTop += delta;
+    lastY = currentY;
+
+    console.log(delta);
+    e.preventDefault();
   });
 });
 

@@ -549,6 +549,7 @@ body {
 .horizontal-scroll__wrapper {
   height: 100vh;
   overflow: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .horizontal-scroll_inner {

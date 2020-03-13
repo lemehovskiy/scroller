@@ -10,9 +10,10 @@ body {
 .horizontal-scroll__wrapper {
   height: 100vh;
   overflow: hidden;
-  //&::-webkit-scrollbar {
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar {
     //display: none;
-  //}
+  }
 }
 
 .horizontal-scroll_inner {
