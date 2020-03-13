@@ -5,19 +5,19 @@ require('../build/scroller.js');
 
 const initHorizontalScroll = () => {
   const $root = $('.horizontal-scroll');
+  const $scrollWrapper = $('.horizontal-scroll__wrapper');
   const $itemsWrapper = $('.horizontal-scroll__items-wrapper');
   const $items = $itemsWrapper.find('.horizontal-scroll__item');
 
+  let resizeTimeout = null;
+
   const state = {
     itemsWrapperWidth: 0,
-    ww: 0,
+    wrapperWidth: 0,
   }
 
   const init = () => {
-    const totalWidth = getTotalWidth();
     onResize();
-
-    console.log('init');
 
     $root.on('progress.scroller refresh.scroller init.scroller', function (item, progress) {
       handleProgressChange(progress);
@@ -31,25 +31,31 @@ const initHorizontalScroll = () => {
       }
     })
 
-    console.log('initScroller');
-
-    setItemsWrapperWidth(totalWidth);
-    setScrollHeight(totalWidth);
-
     $root.scroller({
+      scrollElement: $scrollWrapper,
       triggerOffset: {
         top: '100vh',
         bottom: '-100vh'
       }
     });
+
+    $(window).on('resize', function (){
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        onResize();
+      }, 200)
+    })
   }
 
-  const onResize = () => [
-    state.ww = $(window).outerWidth()
-  ]
+  const onResize = () => {
+    state.wrapperWidth = $scrollWrapper.outerWidth();
+    const totalWidth = getTotalWidth();
+    setItemsWrapperWidth(totalWidth);
+    setScrollHeight(totalWidth);
+  }
 
   const handleProgressChange = (progress) => {
-    TweenMax.to($itemsWrapper, 1, { x: -(state.itemsWrapperWidth - state.ww) * progress })
+    TweenMax.to($itemsWrapper, 1, { x: -(state.itemsWrapperWidth - state.wrapperWidth) * progress })
   }
 
   const setScrollHeight = (height) => {
@@ -68,7 +74,6 @@ const initHorizontalScroll = () => {
       width += $(this).outerWidth();
     })
 
-    console.log(width);
     return width;
   }
 

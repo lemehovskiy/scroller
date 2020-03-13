@@ -7073,19 +7073,19 @@ __webpack_require__(108);
 
 var initHorizontalScroll = function initHorizontalScroll() {
   var $root = $('.horizontal-scroll');
+  var $scrollWrapper = $('.horizontal-scroll__wrapper');
   var $itemsWrapper = $('.horizontal-scroll__items-wrapper');
   var $items = $itemsWrapper.find('.horizontal-scroll__item');
 
+  var resizeTimeout = null;
+
   var state = {
     itemsWrapperWidth: 0,
-    ww: 0
+    wrapperWidth: 0
   };
 
   var init = function init() {
-    var totalWidth = getTotalWidth();
     onResize();
-
-    console.log('init');
 
     $root.on('progress.scroller refresh.scroller init.scroller', function (item, progress) {
       handleProgressChange(progress);
@@ -7099,25 +7099,31 @@ var initHorizontalScroll = function initHorizontalScroll() {
       }
     });
 
-    console.log('initScroller');
-
-    setItemsWrapperWidth(totalWidth);
-    setScrollHeight(totalWidth);
-
     $root.scroller({
+      scrollElement: $scrollWrapper,
       triggerOffset: {
         top: '100vh',
         bottom: '-100vh'
       }
     });
+
+    $(window).on('resize', function () {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(function () {
+        onResize();
+      }, 200);
+    });
   };
 
   var onResize = function onResize() {
-    return [state.ww = $(window).outerWidth()];
+    state.wrapperWidth = $scrollWrapper.outerWidth();
+    var totalWidth = getTotalWidth();
+    setItemsWrapperWidth(totalWidth);
+    setScrollHeight(totalWidth);
   };
 
   var handleProgressChange = function handleProgressChange(progress) {
-    TweenMax.to($itemsWrapper, 1, { x: -(state.itemsWrapperWidth - state.ww) * progress });
+    TweenMax.to($itemsWrapper, 1, { x: -(state.itemsWrapperWidth - state.wrapperWidth) * progress });
   };
 
   var setScrollHeight = function setScrollHeight(height) {
@@ -7136,7 +7142,6 @@ var initHorizontalScroll = function initHorizontalScroll() {
       width += $(this).outerWidth();
     });
 
-    console.log(width);
     return width;
   };
 
@@ -12298,6 +12303,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             //extend by function call
             this.settings = $.extend(true, {
+                scrollElement: $(window),
                 triggerOffset: {
                     top: 0,
                     bottom: 0
@@ -12312,12 +12318,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             this.settings = $.extend(true, self.settings, self.data_options);
 
             this.availableUnits = ['%', 'vh', 'vw', 'px'];
+            this.resizeTimeout = null;
 
             this.state = {
                 isVisible: false,
                 windowSize: {
-                    width: window.innerWidth,
-                    height: window.innerHeight
+                    width: this.settings.scrollElement.outerWidth(),
+                    height: this.settings.scrollElement.outerHeight()
                 },
                 viewport: {
                     top: 0,
@@ -12362,16 +12369,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.onResizeScroll();
                 this.onInit();
 
-                $(window).on('scroll', function () {
+                this.settings.scrollElement.on('scroll', function () {
                     self.onScroll();
+                    self.onResizeScroll();
                 });
 
                 $(window).on('resize', function () {
-                    self.setTriggerOffset();
-                    self.onResize();
-                });
-                $(window).on('scroll resize', function () {
-                    self.onResizeScroll();
+                    clearTimeout(this.resizeTimeout);
+
+                    this.resizeTimeout = setTimeout(function () {
+                        self.setTriggerOffset();
+                        self.onResize();
+                        self.onResizeScroll();
+                    }, 400);
                 });
             }
         }, {
@@ -12456,13 +12466,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'setWindowSize',
             value: function setWindowSize() {
-                this.state.windowSize.width = window.innerWidth;
-                this.state.windowSize.height = window.innerHeight;
+                console.log('setWindowSize');
+                this.state.windowSize.width = this.settings.scrollElement.outerWidth();
+                this.state.windowSize.height = this.settings.scrollElement.outerHeight();
             }
         }, {
             key: 'setViewport',
             value: function setViewport() {
-                this.state.viewport.top = $(window).scrollTop();
+                this.state.viewport.top = this.settings.scrollElement.scrollTop();
                 this.state.viewport.bottom = this.state.viewport.top + this.state.windowSize.height;
             }
         }, {
@@ -12487,6 +12498,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'onResize',
             value: function onResize() {
+                console.log('onResize');
                 this.setWindowSize();
                 this.setSectionHeight(this.$element.outerHeight());
                 this.setOffset();
@@ -12500,6 +12512,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'setProgress',
             value: function setProgress(progress) {
+                console.log(progress);
                 this.state.progress.percent = progress;
             }
         }, {
@@ -12531,6 +12544,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'onHidden',
             value: function onHidden() {
+                console.log('onHidden');
                 this.state.isVisible = false;
                 this.$element.trigger('hidden.scroller', this.state.progress.percent);
             }

@@ -537,6 +537,24 @@ section {
   margin: 15px 0 0;
 }
 
+body {
+  overflow: hidden;
+}
+
+.horizontal-scroll {
+  position: relative;
+  z-index: 2;
+}
+
+.horizontal-scroll__wrapper {
+  height: 100vh;
+  overflow: auto;
+}
+
+.horizontal-scroll__wrapper::-webkit-scrollbar {
+  display: none;
+}
+
 .horizontal-scroll_inner {
   overflow: hidden;
   position: fixed;
@@ -602,6 +620,7 @@ section {
 }
 
 .horizontal-scroll__item {
+  width: 100vw;
   min-width: 100vw;
 }
 

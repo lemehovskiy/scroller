@@ -104,6 +104,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             //extend by function call
             this.settings = $.extend(true, {
+                scrollElement: $(window),
                 triggerOffset: {
                     top: 0,
                     bottom: 0
@@ -118,12 +119,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             this.settings = $.extend(true, self.settings, self.data_options);
 
             this.availableUnits = ['%', 'vh', 'vw', 'px'];
+            this.resizeTimeout = null;
 
             this.state = {
                 isVisible: false,
                 windowSize: {
-                    width: window.innerWidth,
-                    height: window.innerHeight
+                    width: this.settings.scrollElement.outerWidth(),
+                    height: this.settings.scrollElement.outerHeight()
                 },
                 viewport: {
                     top: 0,
@@ -168,16 +170,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.onResizeScroll();
                 this.onInit();
 
-                $(window).on('scroll', function () {
+                this.settings.scrollElement.on('scroll', function () {
                     self.onScroll();
+                    self.onResizeScroll();
                 });
 
                 $(window).on('resize', function () {
-                    self.setTriggerOffset();
-                    self.onResize();
-                });
-                $(window).on('scroll resize', function () {
-                    self.onResizeScroll();
+                    clearTimeout(this.resizeTimeout);
+
+                    this.resizeTimeout = setTimeout(function () {
+                        self.setTriggerOffset();
+                        self.onResize();
+                        self.onResizeScroll();
+                    }, 400);
                 });
             }
         }, {
@@ -262,13 +267,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'setWindowSize',
             value: function setWindowSize() {
-                this.state.windowSize.width = window.innerWidth;
-                this.state.windowSize.height = window.innerHeight;
+                console.log('setWindowSize');
+                this.state.windowSize.width = this.settings.scrollElement.outerWidth();
+                this.state.windowSize.height = this.settings.scrollElement.outerHeight();
             }
         }, {
             key: 'setViewport',
             value: function setViewport() {
-                this.state.viewport.top = $(window).scrollTop();
+                this.state.viewport.top = this.settings.scrollElement.scrollTop();
                 this.state.viewport.bottom = this.state.viewport.top + this.state.windowSize.height;
             }
         }, {
@@ -293,6 +299,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'onResize',
             value: function onResize() {
+                console.log('onResize');
                 this.setWindowSize();
                 this.setSectionHeight(this.$element.outerHeight());
                 this.setOffset();
@@ -306,6 +313,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'setProgress',
             value: function setProgress(progress) {
+                console.log(progress);
                 this.state.progress.percent = progress;
             }
         }, {
@@ -337,6 +345,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'onHidden',
             value: function onHidden() {
+                console.log('onHidden');
                 this.state.isVisible = false;
                 this.$element.trigger('hidden.scroller', this.state.progress.percent);
             }
