@@ -6,19 +6,26 @@ import {
   getProgress,
 } from "@lemehovskiy/scroller-utils/dist";
 
+type HandlerType<T> = (data?: T) => void;
+
+type TriggerOffsetType = {
+  start: number | string;
+  end: number | string;
+};
+
 interface ILiteEvent<T> {
-  on(handler: { (data?: T): void }): void;
-  off(handler: { (data?: T): void }): void;
+  on(handler: HandlerType<T>): void;
+  off(handler: HandlerType<T>): void;
 }
 
 class LiteEvent<T> implements ILiteEvent<T> {
-  private handlers: { (data?: T): void }[] = [];
+  private handlers: HandlerType<T>[] = [];
 
-  public on(handler: { (data?: T): void }): void {
+  public on(handler: HandlerType<T>) {
     this.handlers.push(handler);
   }
 
-  public off(handler: { (data?: T): void }): void {
+  public off(handler: HandlerType<T>) {
     this.handlers = this.handlers.filter((h) => h !== handler);
   }
 
@@ -31,13 +38,10 @@ class LiteEvent<T> implements ILiteEvent<T> {
   }
 }
 
-class Scroller {
+export default class Scroller {
   private element: HTMLElement;
   private options: {
-    scrollTriggerOffset: {
-      start: number | string;
-      end: number | string;
-    };
+    scrollTriggerOffset: TriggerOffsetType;
     autoAdjustScrollOffset: boolean;
   };
   private elementTriggerOffsetTop: number;
@@ -51,12 +55,9 @@ class Scroller {
   constructor(
     element: HTMLElement,
     options?: {
-      scrollTriggerOffset?: {
-        start: number | string;
-        end: number | string;
-      };
+      scrollTriggerOffset?: TriggerOffsetType;
       autoAdjustScrollOffset?: boolean;
-    }
+    },
   ) {
     this.element = element;
     this.options = {
@@ -102,7 +103,7 @@ class Scroller {
       elementViewportOffsetTop,
       elementHeight,
       this.options.scrollTriggerOffset,
-      this.options.autoAdjustScrollOffset
+      this.options.autoAdjustScrollOffset,
     );
 
     this.elementTriggerOffsetTop = elementTriggerOffsetTop;
@@ -120,7 +121,7 @@ class Scroller {
       windowHeight,
       this.scrollTriggerOffsetPxStart,
       this.elementTriggerOffsetTop,
-      this.progressLength
+      this.progressLength,
     );
 
     this.progress = progress;
@@ -139,5 +140,3 @@ class Scroller {
     window.addEventListener("resize", this.onResize);
   };
 }
-
-export default Scroller;
