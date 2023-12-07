@@ -36,7 +36,7 @@ npm i @lemehovskiy/scroller
 index.js
 
 ```js
-import Scroller from "@lemehovskiy/scroller/dist";
+import Scroller from "@lemehovskiy/scroller";
 
 const scroller = new Scroller(document.querySelector('.scroller-element'), {
   autoAdjustScrollOffset: true,
