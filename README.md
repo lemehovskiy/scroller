@@ -17,7 +17,7 @@
 
 ## Demo <a name="demo"></a>
 
-[Basic Scroller](https://codesandbox.io/p/sandbox/lemehovskiy-scroller-ytdf3f)
+[Basic demo](https://codepen.io/lemehovskiy/pen/MWLxbXb)
 
 ## 🧐 About <a name = "about"></a>
 
