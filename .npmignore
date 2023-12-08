@@ -6,3 +6,5 @@ src
 prettierrc.json
 tsconfig.json
 vite.config.ts
+.github
+.eslintignore

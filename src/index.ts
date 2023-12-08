@@ -13,6 +13,11 @@ type TriggerOffsetType = {
   end: number | string;
 };
 
+type OptionsType = {
+  scrollTriggerOffset: TriggerOffsetType;
+  autoAdjustScrollOffset: boolean;
+};
+
 interface ILiteEvent<T> {
   on(handler: HandlerType<T>): void;
   off(handler: HandlerType<T>): void;
@@ -40,10 +45,7 @@ class LiteEvent<T> implements ILiteEvent<T> {
 
 export default class Scroller {
   private element: HTMLElement;
-  private options: {
-    scrollTriggerOffset: TriggerOffsetType;
-    autoAdjustScrollOffset: boolean;
-  };
+  private options: OptionsType;
   private elementTriggerOffsetTop: number;
   private elementTriggerOffsetBottom: number;
   private scrollTriggerOffsetPxStart: number;
@@ -52,13 +54,8 @@ export default class Scroller {
   private progress: number;
   private readonly onProgress = new LiteEvent<number>();
 
-  constructor(
-    element: HTMLElement,
-    options?: {
-      scrollTriggerOffset?: TriggerOffsetType;
-      autoAdjustScrollOffset?: boolean;
-    },
-  ) {
+  constructor(element: HTMLElement | null, options?: OptionsType) {
+    if (element === null) return;
     this.element = element;
     this.options = {
       scrollTriggerOffset: { start: 0, end: 0 },
