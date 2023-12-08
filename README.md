@@ -17,7 +17,7 @@
 
 ## Demo <a name="demo"></a>
 
-[Basic Scroller](https://codesandbox.io/s/lemehovskiy-react-scroller-simple-demo-e3c8d?file=/src/App.tsx)
+[Basic Scroller](https://codesandbox.io/p/sandbox/lemehovskiy-scroller-ytdf3f)
 
 ## 🧐 About <a name = "about"></a>
 
@@ -38,18 +38,23 @@ index.js
 ```js
 import Scroller from "@lemehovskiy/scroller";
 
-const scroller = new Scroller(document.querySelector('.scroller-element'), {
+const scroller = new Scroller(document.querySelector(".scroller-element"), {
   autoAdjustScrollOffset: true,
 });
+const progressEl = document.getElementById("progress");
 
-scroller.progressChanged.on((progress) => {
-  console.log(progress);
-});
+if (progressEl) {
+  scroller.progressChanged.on((progress) => {
+    progressEl.innerHTML = "" + progress;
+  });
+}
+
 ```
 
 index.html
 
 ```html
+<div id="progress"></div>
 <div class="spacer"></div>
 <div class="scroller-element"></div>
 <div class="spacer"></div>
@@ -62,9 +67,13 @@ style.css
   min-height: 500px;
   background-color: aquamarine;
 }
-
 .scroller-element {
   min-height: 700px;
   background-color: azure;
+}
+#progress {
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 ```
