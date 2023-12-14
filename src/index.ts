@@ -18,6 +18,8 @@ type OptionsType = {
   autoAdjustScrollOffset: boolean;
 };
 
+type InputElement = HTMLElement | Element;
+
 interface ILiteEvent<T> {
   on(handler: HandlerType<T>): void;
   off(handler: HandlerType<T>): void;
@@ -44,7 +46,7 @@ class LiteEvent<T> implements ILiteEvent<T> {
 }
 
 export default class Scroller {
-  private element: HTMLElement;
+  private element: InputElement;
   private options: OptionsType;
   private elementTriggerOffsetTop: number;
   private elementTriggerOffsetBottom: number;
@@ -54,7 +56,7 @@ export default class Scroller {
   private progress: number;
   private readonly onProgress = new LiteEvent<number>();
 
-  constructor(element: HTMLElement | null, options?: OptionsType) {
+  constructor(element: InputElement | null, options?: Partial<OptionsType>) {
     if (element === null) return;
     this.element = element;
     this.options = {
