@@ -18,7 +18,7 @@ type OptionsType = {
   autoAdjustScrollOffset: boolean;
 };
 
-type InputElement = HTMLElement | Element;
+type InputElement = HTMLElement;
 
 interface ILiteEvent<T> {
   on(handler: HandlerType<T>): void;
