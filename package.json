@@ -1,6 +1,6 @@
 {
   "name": "@lemehovskiy/scroller",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "VannilaJS plugin for detecting vertical scroll progress",
   "types": "./dist/index.d.ts",
   "main": "./dist/scroller.umd.js",
