@@ -17,7 +17,8 @@
 
 ## Demo <a name="demo"></a>
 
-[Basic demo](https://codepen.io/lemehovskiy/pen/MWLxbXb)
+[Basic demo](https://codesandbox.io/p/devbox/lemehovskiy-scroller-basic-demo-63fxc8)
+[Auto adjust scroll offset demo](https://codesandbox.io/p/devbox/lemehovskiy-scroller-auto-adjust-scroll-offset-demo-fgfwh4)
 
 ## 🧐 About <a name = "about"></a>
 
